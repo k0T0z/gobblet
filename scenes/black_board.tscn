@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://dpl62n61tkp0f"]
+
+[node name="BlackBoard" type="Control"]
+layout_mode = 3
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -250.0
+offset_right = 200.0
+offset_bottom = 250.0
+grow_vertical = 2
+
+[node name="Board" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -250.0
+offset_right = 200.0
+offset_bottom = 250.0
+grow_vertical = 2
+
+[node name="BoardBackground" type="ColorRect" parent="Board"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -250.0
+offset_right = 200.0
+offset_bottom = 250.0
+grow_vertical = 2
+color = Color(0.403922, 0.403922, 0.403922, 1)
+
+[node name="BoardVBox" type="VBoxContainer" parent="Board"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -250.0
+offset_right = 200.0
+offset_bottom = 250.0
+grow_vertical = 2
+theme_override_constants/separation = 10
+alignment = 1

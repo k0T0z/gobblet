@@ -1,0 +1,53 @@
+[gd_scene load_steps=4 format=3 uid="uid://pp4kf6qdi75p"]
+
+[ext_resource type="Script" path="res://h_v_h.cs" id="1_qslrx"]
+[ext_resource type="Script" path="res://h_v_ai.cs" id="2_umulb"]
+[ext_resource type="Script" path="res://ai_v_ai.cs" id="3_36vxv"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+color = Color(1, 1, 0.568627, 1)
+
+[node name="h_v_h" type="Button" parent="."]
+layout_mode = 0
+offset_left = 440.0
+offset_top = 200.0
+offset_right = 840.0
+offset_bottom = 300.0
+theme_override_font_sizes/font_size = 40
+text = "Human VS Human"
+script = ExtResource("1_qslrx")
+
+[node name="h_v_ai" type="Button" parent="."]
+layout_mode = 0
+offset_left = 440.0
+offset_top = 350.0
+offset_right = 840.0
+offset_bottom = 450.0
+theme_override_font_sizes/font_size = 40
+text = "Human VS AI"
+script = ExtResource("2_umulb")
+
+[node name="ai_v_ai" type="Button" parent="."]
+layout_mode = 0
+offset_left = 440.0
+offset_top = 500.0
+offset_right = 840.0
+offset_bottom = 600.0
+theme_override_font_sizes/font_size = 40
+text = "AI VS AI"
+script = ExtResource("3_36vxv")
+
+[connection signal="pressed" from="h_v_h" to="h_v_h" method="OnButtonPressed"]
+[connection signal="pressed" from="h_v_ai" to="h_v_ai" method="OnButtonPressed"]
+[connection signal="pressed" from="ai_v_ai" to="ai_v_ai" method="OnButtonPressed"]

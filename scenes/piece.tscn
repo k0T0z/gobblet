@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3 uid="uid://g6erxs44kl2y"]
+
+[ext_resource type="Script" path="res://Piece.cs" id="1_ebv5a"]
+
+[node name="Piece" type="Node2D"]
+script = ExtResource("1_ebv5a")
+
+[node name="Icon" type="TextureRect" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[connection signal="gui_input" from="Icon" to="." method="OnGUIInput"]
