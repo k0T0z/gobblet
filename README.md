@@ -16,3 +16,15 @@
 1. Download and install the requirements
 2. Open the project in Godot
 3. Run the project
+
+# `fen` format
+
+The `fen` format is a string that represents the state of the board. It is used to save and load games.
+
+# Rules
+
+
+
+# Screenshots
+
+
