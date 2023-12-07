@@ -199,6 +199,11 @@ public partial class Game : Control
 		{
 			return;
 		}
+		
+		if (tile.Type != TileTypes.PLAYGROUND) {
+			_pieceSelected = null;
+			return;
+		}
 
 		MovePiece(_pieceSelected, tile.TileID);
 
