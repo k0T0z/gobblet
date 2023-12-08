@@ -214,7 +214,6 @@ public partial class Game : Control
 		//}
 		
 		// TODO: Solve problem of stacking in playground board.
-
 		
 		if (piece.TileType != TileTypes.PLAYGROUND) {
 			switch (piece.TileType) {
