@@ -215,8 +215,6 @@ public partial class Game : Control
 		
 		// TODO: Solve problem of stacking in playground board.
 
-		var tween = GetTree().CreateTween();
-		tween.TweenProperty(piece, "global_position", _playgroundBoardTiles[location].GlobalPosition + _iconOffset, 0.5);
 		
 		if (piece.TileType != TileTypes.PLAYGROUND) {
 			switch (piece.TileType) {
@@ -245,12 +243,15 @@ public partial class Game : Control
 				default: break;
 			}
 			_playgroundBoardNode.AddChild(piece);
+			piece.GlobalPosition = _playgroundBoardTiles[location].GlobalPosition + _iconOffset;
 			_playgroundBoardPieces[location].Push(piece);
 			piece.TileType = TileTypes.PLAYGROUND;
 		}
 		else {
 			_playgroundBoardPieces[piece.TileID].Pop();
 			_playgroundBoardPieces[location].Push(piece);
+			var tween = GetTree().CreateTween();
+			tween.TweenProperty(piece, "global_position", _playgroundBoardTiles[location].GlobalPosition + _iconOffset, 0.5);
 		}
 		
 		piece.TileID = location;
