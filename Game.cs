@@ -10,18 +10,16 @@ public partial class Game : Control
 	private PackedScene _pieceScene;
 	private Control _playgroundBoardNode;
 	private List<Tile> _playgroundBoardTiles;
-	private List<Piece> _playgroundBoardPieces;
+	private List<Stack<Piece>> _playgroundBoardPieces;
 	private List<string> _assetPaths;
 
 	private List<Tile> _whiteBoardTiles;
 	private List<Tile> _blackBoardTiles;
-	private List<Piece> _whiteBoardPieces;
-	private List<Piece> _blackBoardPieces;
+	private List<Stack<Piece>> _whiteBoardPieces;
+	private List<Stack<Piece>> _blackBoardPieces;
 
 	private PackedScene _whiteBoardScene;
 	private PackedScene _blackBoardScene;
-	private List<Stack<Piece>> _whiteOutPieces;
-	private List<Stack<Piece>> _blackOutPieces;
 
 	private VBoxContainer _whiteBoardTilesNode;
 	private VBoxContainer _blackBoardTilesNode;
@@ -41,7 +39,7 @@ public partial class Game : Control
 		_playgroundBoardNode = GetNode<Control>("Board");
 
 		_playgroundBoardTiles = new List<Tile>();
-		_playgroundBoardPieces = new List<Piece>();
+		_playgroundBoardPieces = new List<Stack<Piece>>();
 		_assetPaths = new List<string>();
 
 		/* 
@@ -62,7 +60,7 @@ public partial class Game : Control
 		for (int i = 0; i < 16; i++)
 		{
 			CreateTile(i);
-			_playgroundBoardPieces.Add(null); // Initialize the `_pieceArray`.
+			_playgroundBoardPieces.Add(new Stack<Piece>()); // Initialize the `_pieceArray`.
 		}
 
 		_whiteBoardTilesNode = GetNode<VBoxContainer>("WhiteBoard/Board/BoardVBox");
@@ -72,24 +70,19 @@ public partial class Game : Control
 
 		_whiteBoardTiles = new List<Tile>();
 		_blackBoardTiles = new List<Tile>();
-		_whiteBoardPieces = new List<Piece>();
-		_blackBoardPieces = new List<Piece>();
-
-		_whiteOutPieces = new List<Stack<Piece>>();
-		_blackOutPieces = new List<Stack<Piece>>();
+		_whiteBoardPieces = new List<Stack<Piece>>();
+		_blackBoardPieces = new List<Stack<Piece>>();
 
 		for (int i = 0; i < 3; i++)
 		{
-			_whiteOutPieces.Add(new Stack<Piece>());
-			_blackOutPieces.Add(new Stack<Piece>());
 			CreateWhiteTile(i);
 			CreateBlackTile(i);
-			_whiteBoardPieces.Add(null);
-			_blackBoardPieces.Add(null);
+			_whiteBoardPieces.Add(new Stack<Piece>());
+			_blackBoardPieces.Add(new Stack<Piece>());
 		}
 
-		InitWhiteOutPieces();
-		InitBlackOutPieces();
+		InitWhiteBoardPieces();
+		InitBlackBoardPieces();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -127,7 +120,7 @@ public partial class Game : Control
 		tile.TileClicked += OnTileClicked;
 	}
 
-	private void InitWhiteOutPieces()
+	private void InitWhiteBoardPieces()
 	{
 		for (int i = 0; i < 4; i++)
 		{
@@ -146,12 +139,12 @@ public partial class Game : Control
 				}
 				piece.Type = type;
 				piece.SetTexture(GD.Load<Texture2D>(_assetPaths[type]));
-				_whiteOutPieces[j].Push(piece);
+				_whiteBoardPieces[j].Push(piece);
 			}
 		}
 	}
 
-	private void InitBlackOutPieces()
+	private void InitBlackBoardPieces()
 	{
 		for (int i = 0; i < 4; i++)
 		{
@@ -170,22 +163,24 @@ public partial class Game : Control
 				}
 				piece.Type = type;
 				piece.SetTexture(GD.Load<Texture2D>(_assetPaths[type]));
-				_blackOutPieces[j].Push(piece);
+				_blackBoardPieces[j].Push(piece);
 			}
 		}
 	}
 	
 	public void InitGame() {
+		if (_whiteBoardPieces.Count == 0 || _blackBoardPieces.Count == 0) {
+			return;
+		}
+		
 		for (int i = 0; i < 3; i++)
 		{
-			Piece whitePiece = _whiteOutPieces[i].Pop();
-			Piece blackPiece = _blackOutPieces[i].Pop();
+			Piece whitePiece = _whiteBoardPieces[i].Peek();
+			Piece blackPiece = _blackBoardPieces[i].Peek();
 			_whiteBoardNode.AddChild(whitePiece);
 			_blackBoardNode.AddChild(blackPiece);
 			whitePiece.GlobalPosition = _whiteBoardTiles[i].GlobalPosition + _iconOffset;
 			blackPiece.GlobalPosition = _blackBoardTiles[i].GlobalPosition + _iconOffset;
-			_whiteBoardPieces[i] = whitePiece;
-			_blackBoardPieces[i] = blackPiece;
 			whitePiece.TileID = i;
 			blackPiece.TileID = i;
 			whitePiece.PieceSelected += OnPieceSelected;
@@ -212,11 +207,13 @@ public partial class Game : Control
 
 	public void MovePiece(Piece piece, int location)
 	{
-		if (_playgroundBoardPieces[location] != null)
-		{
-			_playgroundBoardPieces[location].QueueFree();
-			_playgroundBoardPieces[location] = null;
-		}
+		//if (_playgroundBoardPieces[location].Count != 0)
+		//{
+			//_playgroundBoardPieces[location].Peek().QueueFree();
+			//_playgroundBoardPieces[location].Pop();
+		//}
+		
+		// TODO: Solve problem of stacking in playground board.
 
 		var tween = GetTree().CreateTween();
 		tween.TweenProperty(piece, "global_position", _playgroundBoardTiles[location].GlobalPosition + _iconOffset, 0.5);
@@ -224,43 +221,36 @@ public partial class Game : Control
 		if (piece.TileType != TileTypes.PLAYGROUND) {
 			switch (piece.TileType) {
 				case TileTypes.WHITE: {
-					if (_whiteOutPieces[piece.TileID].Count != 0) {
-						Piece whitePiece = _whiteOutPieces[piece.TileID].Pop();
-						_whiteBoardPieces[piece.TileID] = whitePiece;
+					_whiteBoardNode.RemoveChild(_whiteBoardPieces[piece.TileID].Pop());
+					if (_whiteBoardPieces[piece.TileID].Count != 0) {
+						Piece whitePiece = _whiteBoardPieces[piece.TileID].Peek();
 						_whiteBoardNode.AddChild(whitePiece);
 						whitePiece.GlobalPosition = _whiteBoardTiles[piece.TileID].GlobalPosition + _iconOffset;
-						_whiteBoardPieces[piece.TileID] = whitePiece;
 						whitePiece.TileID = piece.TileID;
 						whitePiece.PieceSelected += OnPieceSelected;
-					}
-					else {
-						_whiteBoardPieces[piece.TileID] = null;
 					}
 					break;
 				}
 				case TileTypes.BLACK: {
-					if (_blackOutPieces[piece.TileID].Count != 0) {
-						Piece blackPiece = _blackOutPieces[piece.TileID].Pop();
-						_blackBoardPieces[piece.TileID] = blackPiece;
+					_blackBoardNode.RemoveChild(_blackBoardPieces[piece.TileID].Pop());
+					if (_blackBoardPieces[piece.TileID].Count != 0) {
+						Piece blackPiece = _blackBoardPieces[piece.TileID].Peek();
 						_blackBoardNode.AddChild(blackPiece);
 						blackPiece.GlobalPosition = _blackBoardTiles[piece.TileID].GlobalPosition + _iconOffset;
-						_blackBoardPieces[piece.TileID] = blackPiece;
 						blackPiece.TileID = piece.TileID;
 						blackPiece.PieceSelected += OnPieceSelected;
-					}
-					else {
-						_whiteBoardPieces[piece.TileID] = null;
 					}
 					break;
 				}
 				default: break;
 			}
-			_playgroundBoardPieces[location] = piece;
+			_playgroundBoardNode.AddChild(piece);
+			_playgroundBoardPieces[location].Push(piece);
 			piece.TileType = TileTypes.PLAYGROUND;
 		}
 		else {
-			_playgroundBoardPieces[piece.TileID] = null;
-			_playgroundBoardPieces[location] = piece;
+			_playgroundBoardPieces[piece.TileID].Pop();
+			_playgroundBoardPieces[location].Push(piece);
 		}
 		
 		piece.TileID = location;
@@ -275,7 +265,7 @@ public partial class Game : Control
 		piece.TileType = TileTypes.PLAYGROUND;
 		piece.SetTexture(GD.Load<Texture2D>(_assetPaths[type]));
 		piece.GlobalPosition = _playgroundBoardTiles[location].GlobalPosition + _iconOffset;
-		_playgroundBoardPieces[location] = piece;
+		_playgroundBoardPieces[location].Push(piece);
 		piece.TileID = location;
 		piece.PieceSelected += OnPieceSelected;
 	}

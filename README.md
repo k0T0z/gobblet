@@ -6,20 +6,18 @@
 
 ### Windows
 
-- [Godot_v4.1.3-stable](https://github.com/godotengine/godot/releases/download/4.1.3-stable/Godot_v4.1.3-stable_mono_win64.zip)
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.100-windows-x64-installer)
+- [Godot_v4.1.3-stable](https://github.com/godotengine/godot/releases/download/4.1.3-stable/Godot_v4.1.3-stable_mono_win64.zip).
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.100-windows-x64-installer).
 
 ## Building
 
+
+
 ### Windows
 
-1. Download and install the requirements
-2. Open the project in Godot
-3. Run the project
-
-# `fen` format
-
-The `fen` format is a string that represents the state of the board. It is used to save and load games.
+1. Download and install the requirements.
+2. Open the project in Godot.
+3. Run the project.
 
 # Rules
 
@@ -28,3 +26,9 @@ The `fen` format is a string that represents the state of the board. It is used 
 # Screenshots
 
 
+
+# References
+
+1. [Game Rules](https://www.boardspace.net/gobblet/english/gobblet_rules.pdf).
+2. [Gather Together Games Gobblet Presentation](https://www.youtube.com/watch?v=aSaAjQY8_b0).
+3. [These fresh Godot tutorials by Alphredo M were very helpful to me](https://www.youtube.com/watch?v=fW7_0uBHsBw&list=PLrx2VhSBm-FcO9TeLv2fUg6VxO43jkM4Y).
