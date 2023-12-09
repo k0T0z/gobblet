@@ -7,7 +7,6 @@
 ### Windows
 
 - [Godot_v4.2-stable](https://github.com/godotengine/godot/releases/download/4.2-stable/Godot_v4.2-stable_mono_win64.zip).
-- 
 - [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.100-windows-x64-installer).
 
 ## Building
