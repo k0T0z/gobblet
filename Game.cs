@@ -247,6 +247,7 @@ public partial class Game : Control
 			piece.TileType = TileTypes.PLAYGROUND;
 		}
 		else {
+			_playgroundBoardNode.MoveChild(piece, -1);
 			_playgroundBoardPieces[piece.TileID].Pop();
 			_playgroundBoardPieces[location].Push(piece);
 			var tween = GetTree().CreateTween();
