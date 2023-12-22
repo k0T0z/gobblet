@@ -80,9 +80,6 @@ public partial class Game : Control
 			_whiteBoardPieces.Add(new Stack<Piece>());
 			_blackBoardPieces.Add(new Stack<Piece>());
 		}
-
-		InitWhiteBoardPieces();
-		InitBlackBoardPieces();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -169,9 +166,23 @@ public partial class Game : Control
 	}
 	
 	public void InitGame() {
-		if (_whiteBoardPieces.Count == 0 || _blackBoardPieces.Count == 0) {
-			return;
+		for (int i = 0 ; i < 16 ; i++) {
+			for (int j = 0 ; j < _playgroundBoardPieces[i].Count; j++) {
+				_playgroundBoardNode.RemoveChild(_playgroundBoardPieces[i].Pop());
+			}
 		}
+		
+		for (int i = 0 ; i < 3 ; i++) {
+			for (int j = 0 ; j < _whiteBoardPieces[i].Count; j++) {
+				_whiteBoardNode.RemoveChild(_whiteBoardPieces[i].Pop());
+			}
+			for (int j = 0 ; j < _blackBoardPieces[i].Count; j++) {
+				_blackBoardNode.RemoveChild(_blackBoardPieces[i].Pop());
+			}
+		}
+		
+		InitWhiteBoardPieces();
+		InitBlackBoardPieces();
 		
 		for (int i = 0; i < 3; i++)
 		{
@@ -212,8 +223,6 @@ public partial class Game : Control
 			//_playgroundBoardPieces[location].Peek().QueueFree();
 			//_playgroundBoardPieces[location].Pop();
 		//}
-		
-		// TODO: Solve problem of stacking in playground board.
 		
 		if (piece.TileType != TileTypes.PLAYGROUND) {
 			switch (piece.TileType) {

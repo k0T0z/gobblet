@@ -1,5 +1,15 @@
 # Gobblet
 
+## State
+
+- Board with pieces' positions.
+- Whose turn it is.
+
+## Number of actions at each state (worst case)
+
+- 3 * 16 = 48 actions: When picking a piece from side boards.
+- 8 * 8 = 64 actions: When moving a piece on the board (biggest piece).
+
 # Building the project
 
 ## Requirements
