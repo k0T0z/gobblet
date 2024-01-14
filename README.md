@@ -1,5 +1,7 @@
 # Gobblet
 
+https://github.com/k0T0z/gobblet/assets/74428638/20445c0f-7bb9-440d-92bf-a178c99a3e20
+
 ## State
 
 - Board with pieces' positions.
