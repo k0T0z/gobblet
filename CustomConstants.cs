@@ -23,7 +23,7 @@ namespace CustomConstants
 		
 	public enum TileStates {
 		NONE,
-		FREE
+		LEGITIMATE
 	}
 }
 

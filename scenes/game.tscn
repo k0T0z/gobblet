@@ -88,19 +88,8 @@ grow_horizontal = 2
 grow_vertical = 2
 columns = 4
 
-[node name="Button" type="Button" parent="."]
-layout_mode = 0
-offset_left = 1070.0
-offset_top = 7.0
-offset_right = 1247.0
-offset_bottom = 92.0
-theme_override_font_sizes/font_size = 56
-text = "Test"
-
 [node name="WhiteBoard" parent="." instance=ExtResource("2_y1kiy")]
 layout_mode = 1
 
 [node name="BlackBoard" parent="." instance=ExtResource("3_tfbjl")]
 layout_mode = 1
-
-[connection signal="pressed" from="Button" to="." method="OnButtonPressed"]

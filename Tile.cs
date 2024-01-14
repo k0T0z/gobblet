@@ -62,7 +62,7 @@ public partial class Tile : Control
 			case TileStates.NONE:
 				_filter.Color = new Color(0, 0, 0, 0);
 				break;
-			case TileStates.FREE:
+			case TileStates.LEGITIMATE:
 				_filter.Color = new Color(0, 1, 0, (float)0.4);
 				break;
 			default:

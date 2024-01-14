@@ -46,16 +46,17 @@ public partial class Game : Control
 			The rest of the code depends on this order in the `_assets` list.
 			This is the same order as `CustomConstants.PieceTypes`.
 		*/
-		_assetPaths.Add("res://assets/white_25px.svg");
-		_assetPaths.Add("res://assets/white_50px.svg");
-		_assetPaths.Add("res://assets/white_75px.svg");
-		_assetPaths.Add("res://assets/white_100px.svg");
-		_assetPaths.Add("res://assets/black_25px.svg");
-		_assetPaths.Add("res://assets/black_50px.svg");
-		_assetPaths.Add("res://assets/black_75px.svg");
-		_assetPaths.Add("res://assets/black_100px.svg");
+		_assetPaths.Add("res://assets/white_25px.svg"); // 0
+		_assetPaths.Add("res://assets/white_50px.svg"); // 1
+		_assetPaths.Add("res://assets/white_75px.svg"); // 2
+		_assetPaths.Add("res://assets/white_100px.svg"); // 3
+		_assetPaths.Add("res://assets/black_25px.svg"); // 4
+		_assetPaths.Add("res://assets/black_50px.svg"); // 5
+		_assetPaths.Add("res://assets/black_75px.svg"); // 6
+		_assetPaths.Add("res://assets/black_100px.svg"); // 7
 
 		_pieceSelected = null;
+		HidePossibleMoves();
 
 		for (int i = 0; i < 16; i++)
 		{
@@ -128,14 +129,13 @@ public partial class Game : Control
 				int type = -1;
 				switch (i)
 				{
-					case 0: type = (int)PieceTypes.WHITE_25PX; break;
-					case 1: type = (int)PieceTypes.WHITE_50PX; break;
-					case 2: type = (int)PieceTypes.WHITE_75PX; break;
-					case 3: type = (int)PieceTypes.WHITE_100PX; break;
+					case 0: type = 1; piece.SetTexture(GD.Load<Texture2D>(_assetPaths[0])); break; // PieceTypes.WHITE_25PX
+					case 1: type = 2; piece.SetTexture(GD.Load<Texture2D>(_assetPaths[1])); break; // PieceTypes.WHITE_50PX
+					case 2: type = 3; piece.SetTexture(GD.Load<Texture2D>(_assetPaths[2])); break; // PieceTypes.WHITE_75PX
+					case 3: type = 4; piece.SetTexture(GD.Load<Texture2D>(_assetPaths[3])); break; // PieceTypes.WHITE_100PX
 					default: break;
 				}
 				piece.Type = type;
-				piece.SetTexture(GD.Load<Texture2D>(_assetPaths[type]));
 				_whiteBoardPieces[j].Push(piece);
 			}
 		}
@@ -152,14 +152,13 @@ public partial class Game : Control
 				int type = -1;
 				switch (i)
 				{
-					case 0: type = (int)PieceTypes.BLACK_25PX; break;
-					case 1: type = (int)PieceTypes.BLACK_50PX; break;
-					case 2: type = (int)PieceTypes.BLACK_75PX; break;
-					case 3: type = (int)PieceTypes.BLACK_100PX; break;
+					case 0: type = -1; piece.SetTexture(GD.Load<Texture2D>(_assetPaths[4])); break; // PieceTypes.BLACK_25PX
+					case 1: type = -2; piece.SetTexture(GD.Load<Texture2D>(_assetPaths[5])); break; // PieceTypes.BLACK_50PX;
+					case 2: type = -3; piece.SetTexture(GD.Load<Texture2D>(_assetPaths[6])); break; // PieceTypes.BLACK_75PX;
+					case 3: type = -4; piece.SetTexture(GD.Load<Texture2D>(_assetPaths[7])); break; // PieceTypes.BLACK_100PX;
 					default: break;
 				}
 				piece.Type = type;
-				piece.SetTexture(GD.Load<Texture2D>(_assetPaths[type]));
 				_blackBoardPieces[j].Push(piece);
 			}
 		}
@@ -168,16 +167,16 @@ public partial class Game : Control
 	public void InitGame() {
 		for (int i = 0 ; i < 16 ; i++) {
 			for (int j = 0 ; j < _playgroundBoardPieces[i].Count; j++) {
-				_playgroundBoardNode.RemoveChild(_playgroundBoardPieces[i].Pop());
+				_playgroundBoardNode.RemoveChild(_playgroundBoardPieces[i].Pop()); // .QueueFree()
 			}
 		}
 		
 		for (int i = 0 ; i < 3 ; i++) {
 			for (int j = 0 ; j < _whiteBoardPieces[i].Count; j++) {
-				_whiteBoardNode.RemoveChild(_whiteBoardPieces[i].Pop());
+				_whiteBoardNode.RemoveChild(_whiteBoardPieces[i].Pop()); // .QueueFree()
 			}
 			for (int j = 0 ; j < _blackBoardPieces[i].Count; j++) {
-				_blackBoardNode.RemoveChild(_blackBoardPieces[i].Pop());
+				_blackBoardNode.RemoveChild(_blackBoardPieces[i].Pop()); // .QueueFree()
 			}
 		}
 		
@@ -201,29 +200,29 @@ public partial class Game : Control
 
 	private void OnTileClicked(Tile tile)
 	{
+		// If I pressed an empty tile.
 		if (_pieceSelected == null)
 		{
 			return;
 		}
 		
+		// If the destination tile is not playground.
 		if (tile.Type != TileTypes.PLAYGROUND) {
 			_pieceSelected = null;
+			HidePossibleMoves();
 			return;
 		}
 
 		MovePiece(_pieceSelected, tile.TileID);
 
 		_pieceSelected = null;
+		HidePossibleMoves();
 	}
 
 	public void MovePiece(Piece piece, int location)
 	{
-		//if (_playgroundBoardPieces[location].Count != 0)
-		//{
-			//_playgroundBoardPieces[location].Peek().QueueFree();
-			//_playgroundBoardPieces[location].Pop();
-		//}
-		
+		// piece is the source piece that we need to move.
+		// If we will add a new piece to the ground.
 		if (piece.TileType != TileTypes.PLAYGROUND) {
 			switch (piece.TileType) {
 				case TileTypes.WHITE: {
@@ -255,8 +254,9 @@ public partial class Game : Control
 			_playgroundBoardPieces[location].Push(piece);
 			piece.TileType = TileTypes.PLAYGROUND;
 		}
+		// If we will move a piece that is on the ground.
 		else {
-			_playgroundBoardNode.MoveChild(piece, -1);
+			_playgroundBoardNode.MoveChild(piece, -1); // Move the child to the top on the tree.
 			_playgroundBoardPieces[piece.TileID].Pop();
 			_playgroundBoardPieces[location].Push(piece);
 			var tween = GetTree().CreateTween();
@@ -266,54 +266,57 @@ public partial class Game : Control
 		piece.TileID = location;
 	}
 
-
-	public void AddPiece(int type, int location)
-	{
-		Piece piece = (Piece)_pieceScene.Instantiate();
-		_playgroundBoardNode.AddChild(piece);
-		piece.Type = type;
-		piece.TileType = TileTypes.PLAYGROUND;
-		piece.SetTexture(GD.Load<Texture2D>(_assetPaths[type]));
-		piece.GlobalPosition = _playgroundBoardTiles[location].GlobalPosition + _iconOffset;
-		_playgroundBoardPieces[location].Push(piece);
-		piece.TileID = location;
-		piece.PieceSelected += OnPieceSelected;
-	}
-
 	private void OnPieceSelected(Piece piece)
 	{
+		// If I am not selecting any piece.
 		if (_pieceSelected == null)
 		{
 			_pieceSelected = piece;
+			ShowPossibleMoves();
 			return;
 		}
 		
+		// If the source and destination pieces are the same.
 		if (_pieceSelected.TileID == piece.TileID && _pieceSelected.TileType == piece.TileType) {
 			_pieceSelected = null;
+			HidePossibleMoves();
 			return;
 		}
 		
+		// If the destination tile is not in the playground.
 		if (piece.TileType != TileTypes.PLAYGROUND) {
 			_pieceSelected = null;
+			HidePossibleMoves();
+			return;
+		}
+		
+		// If the place is not empty and has bigger piece.
+		if (_playgroundBoardPieces[piece.TileID].Count != 0 && 
+				Math.Abs(_pieceSelected.Type) <= Math.Abs(_playgroundBoardPieces[piece.TileID].Peek().Type)) {
+			_pieceSelected = null;
+			HidePossibleMoves();
 			return;
 		}
 		
 		OnTileClicked(_playgroundBoardTiles[piece.TileID]);
 	}
-
-	private void OnButtonPressed()
-	{
-		AddPiece((int)PieceTypes.BLACK_100PX, 0);
-		//addPiece((int)PieceTypes.WHITE_M, 5);
-		//addPiece((int)PieceTypes.WHITE_S, 10);
-		//addPiece((int)PieceTypes.WHITE_T, 15);
-
-		//int bitmap = 1023;
-		//for (int i = 0 ; i < 16; i++) {
-		//if ((bitmap & 1) != 0) {
-		//_gridArray[15-i].setFilter(SlotStates.FREE);
-		//}
-		//bitmap = bitmap >> 1;
-		//}
+	
+	private void ShowPossibleMoves() {
+		for (int i = 0 ; i < _playgroundBoardPieces.Count ; i++) {
+			// If I am in the same location in the playground board.
+			if (_pieceSelected.TileType == TileTypes.PLAYGROUND && _pieceSelected.TileID == i) continue;
+			
+			// If the place is not empty and has bigger piece.
+			if (_playgroundBoardPieces[i].Count != 0 && 
+				Math.Abs(_pieceSelected.Type) <= Math.Abs(_playgroundBoardPieces[i].Peek().Type)) continue;
+			
+			_playgroundBoardTiles[i].SetFilter(TileStates.LEGITIMATE);
+		}
+	}
+	
+	private void HidePossibleMoves() {
+		for (int i = 0 ; i < _playgroundBoardTiles.Count ; i++) {
+			_playgroundBoardTiles[i].SetFilter(TileStates.NONE);
+		}
 	}
 }
