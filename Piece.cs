@@ -6,13 +6,24 @@ using CustomConstants;
 public partial class Piece : Node2D
 {
 	private int _tileID;
+
+	// | Type | Value       |
+	// | ---- | ----------- |
+	// |  -4  | BLACK_100PX |
+	// |  -3  | BLACK_75PX  |
+	// |  -2  | BLACK_50PX  |
+	// |  -1  | BLACK_25PX  |
+	// |  +4  | WHITE_100PX |
+	// |  +3  | WHITE_75PX  |
+	// |  +2  | WHITE_50PX  |
+	// |  +1  | WHITE_25PX  |
 	private int _type;
 	private TileTypes _tileType;
-	
+
 	public Piece()
 	{
 		_tileID = -1;
-		_type = -1;
+		_type = 0;
 		_tileType = TileTypes.NONE;
 	}
 
@@ -49,7 +60,7 @@ public partial class Piece : Node2D
 			_type = value;
 		}
 	}
-	
+
 	public TileTypes TileType
 	{
 		get

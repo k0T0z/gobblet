@@ -8,7 +8,7 @@ public partial class Tile : Control
 	private TileTypes _type;
 	private ColorRect _filter;
 	private TileStates _state;
-	
+
 	public Tile()
 	{
 		_tileID = -1;
@@ -38,7 +38,7 @@ public partial class Tile : Control
 			_tileID = value;
 		}
 	}
-	
+
 	public TileTypes Type
 	{
 		get
@@ -47,10 +47,23 @@ public partial class Tile : Control
 		}
 		set
 		{
-			if (value != TileTypes.PLAYGROUND) {
+			if (value != TileTypes.PLAYGROUND)
+			{
 				GetNode<TextureRect>("Icon").Texture = null;
 			}
 			_type = value;
+		}
+	}
+
+	public TileStates State
+	{
+		get
+		{
+			return _state;
+		}
+		set
+		{
+			_state = value;
 		}
 	}
 
@@ -64,6 +77,9 @@ public partial class Tile : Control
 				break;
 			case TileStates.LEGITIMATE:
 				_filter.Color = new Color(0, 1, 0, (float)0.4);
+				break;
+			case TileStates.ILLEGITIMATE:
+				_filter.Color = new Color(1, 0, 0, (float)0.4);
 				break;
 			default:
 				break;
