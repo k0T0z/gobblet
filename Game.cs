@@ -10,12 +10,9 @@ public partial class Game : Control
 	private PackedScene _pieceScene;
 	private Control _playgroundBoardNode;
 	private List<Tile> _playgroundBoardTiles;
-	private List<Stack<Piece>> _playgroundBoardPieces;
 
 	private List<Tile> _whiteBoardTiles;
 	private List<Tile> _blackBoardTiles;
-	private List<Stack<Piece>> _whiteBoardPieces;
-	private List<Stack<Piece>> _blackBoardPieces;
 
 	private PackedScene _whiteBoardScene;
 	private PackedScene _blackBoardScene;
@@ -30,6 +27,8 @@ public partial class Game : Control
 	private Piece _pieceSelected;
 	private int _turn;
 
+	private List<int> _extraLegitimateTiles;
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -39,16 +38,15 @@ public partial class Game : Control
 		_playgroundBoardNode = GetNode<Control>("Board");
 
 		_playgroundBoardTiles = new List<Tile>();
-		_playgroundBoardPieces = new List<Stack<Piece>>();
 
 		_pieceSelected = null;
 		_turn = 0;
+		_extraLegitimateTiles = new List<int>();
 		HidePossibleMoves();
 
 		for (int i = 0; i < 16; i++)
 		{
 			CreateTile(i);
-			_playgroundBoardPieces.Add(new Stack<Piece>()); // Initialize the `_pieceArray`.
 		}
 
 		_whiteBoardTilesNode = GetNode<VBoxContainer>("WhiteBoard/Board/BoardVBox");
@@ -58,15 +56,11 @@ public partial class Game : Control
 
 		_whiteBoardTiles = new List<Tile>();
 		_blackBoardTiles = new List<Tile>();
-		_whiteBoardPieces = new List<Stack<Piece>>();
-		_blackBoardPieces = new List<Stack<Piece>>();
 
 		for (int i = 0; i < 3; i++)
 		{
 			CreateWhiteTile(i);
 			CreateBlackTile(i);
-			_whiteBoardPieces.Add(new Stack<Piece>());
-			_blackBoardPieces.Add(new Stack<Piece>());
 		}
 	}
 
@@ -123,7 +117,7 @@ public partial class Game : Control
 					default: break;
 				}
 				piece.Type = type;
-				_whiteBoardPieces[j].Push(piece);
+				_whiteBoardTiles[j].Pieces.Push(piece);
 			}
 		}
 	}
@@ -146,7 +140,7 @@ public partial class Game : Control
 					default: break;
 				}
 				piece.Type = type;
-				_blackBoardPieces[j].Push(piece);
+				_blackBoardTiles[j].Pieces.Push(piece);
 			}
 		}
 	}
@@ -155,21 +149,21 @@ public partial class Game : Control
 	{
 		for (int i = 0; i < 16; i++)
 		{
-			for (int j = 0; j < _playgroundBoardPieces[i].Count; j++)
+			for (int j = 0; j < _playgroundBoardTiles[i].Pieces.Count; j++)
 			{
-				_playgroundBoardNode.RemoveChild(_playgroundBoardPieces[i].Pop()); // .QueueFree()
+				_playgroundBoardNode.RemoveChild(_playgroundBoardTiles[i].Pieces.Pop()); // .QueueFree()
 			}
 		}
 
 		for (int i = 0; i < 3; i++)
 		{
-			for (int j = 0; j < _whiteBoardPieces[i].Count; j++)
+			for (int j = 0; j < _whiteBoardTiles[i].Pieces.Count; j++)
 			{
-				_whiteBoardNode.RemoveChild(_whiteBoardPieces[i].Pop()); // .QueueFree()
+				_whiteBoardNode.RemoveChild(_whiteBoardTiles[i].Pieces.Pop()); // .QueueFree()
 			}
-			for (int j = 0; j < _blackBoardPieces[i].Count; j++)
+			for (int j = 0; j < _blackBoardTiles[i].Pieces.Count; j++)
 			{
-				_blackBoardNode.RemoveChild(_blackBoardPieces[i].Pop()); // .QueueFree()
+				_blackBoardNode.RemoveChild(_blackBoardTiles[i].Pieces.Pop()); // .QueueFree()
 			}
 		}
 
@@ -178,8 +172,8 @@ public partial class Game : Control
 
 		for (int i = 0; i < 3; i++)
 		{
-			Piece whitePiece = _whiteBoardPieces[i].Peek();
-			Piece blackPiece = _blackBoardPieces[i].Peek();
+			Piece whitePiece = _whiteBoardTiles[i].Pieces.Peek();
+			Piece blackPiece = _blackBoardTiles[i].Pieces.Peek();
 			_whiteBoardNode.AddChild(whitePiece);
 			_blackBoardNode.AddChild(blackPiece);
 			whitePiece.GlobalPosition = _whiteBoardTiles[i].GlobalPosition + _iconOffset;
@@ -226,10 +220,10 @@ public partial class Game : Control
 			{
 				case TileTypes.WHITE:
 					{
-						_whiteBoardNode.RemoveChild(_whiteBoardPieces[piece.TileID].Pop());
-						if (_whiteBoardPieces[piece.TileID].Count != 0)
+						_whiteBoardNode.RemoveChild(_whiteBoardTiles[piece.TileID].Pieces.Pop());
+						if (_whiteBoardTiles[piece.TileID].Pieces.Count != 0)
 						{
-							Piece whitePiece = _whiteBoardPieces[piece.TileID].Peek();
+							Piece whitePiece = _whiteBoardTiles[piece.TileID].Pieces.Peek();
 							_whiteBoardNode.AddChild(whitePiece);
 							whitePiece.GlobalPosition = _whiteBoardTiles[piece.TileID].GlobalPosition + _iconOffset;
 							whitePiece.TileID = piece.TileID;
@@ -239,10 +233,10 @@ public partial class Game : Control
 					}
 				case TileTypes.BLACK:
 					{
-						_blackBoardNode.RemoveChild(_blackBoardPieces[piece.TileID].Pop());
-						if (_blackBoardPieces[piece.TileID].Count != 0)
+						_blackBoardNode.RemoveChild(_blackBoardTiles[piece.TileID].Pieces.Pop());
+						if (_blackBoardTiles[piece.TileID].Pieces.Count != 0)
 						{
-							Piece blackPiece = _blackBoardPieces[piece.TileID].Peek();
+							Piece blackPiece = _blackBoardTiles[piece.TileID].Pieces.Peek();
 							_blackBoardNode.AddChild(blackPiece);
 							blackPiece.GlobalPosition = _blackBoardTiles[piece.TileID].GlobalPosition + _iconOffset;
 							blackPiece.TileID = piece.TileID;
@@ -254,15 +248,15 @@ public partial class Game : Control
 			}
 			_playgroundBoardNode.AddChild(piece);
 			piece.GlobalPosition = _playgroundBoardTiles[location].GlobalPosition + _iconOffset;
-			_playgroundBoardPieces[location].Push(piece);
+			_playgroundBoardTiles[location].Pieces.Push(piece);
 			piece.TileType = TileTypes.PLAYGROUND;
 		}
 		// If we will move a piece that is on the ground.
 		else
 		{
 			_playgroundBoardNode.MoveChild(piece, -1); // Move the child to the top on the tree.
-			_playgroundBoardPieces[piece.TileID].Pop();
-			_playgroundBoardPieces[location].Push(piece);
+			_playgroundBoardTiles[piece.TileID].Pieces.Pop();
+			_playgroundBoardTiles[location].Pieces.Push(piece);
 			var tween = GetTree().CreateTween();
 			tween.TweenProperty(piece, "global_position", _playgroundBoardTiles[location].GlobalPosition + _iconOffset, 0.5);
 		}
@@ -272,6 +266,8 @@ public partial class Game : Control
 
 	private void OnPieceSelected(Piece piece)
 	{
+		bool extraLegitimateTiles = false;
+
 		// If I am not selecting any piece.
 		if (_pieceSelected == null)
 		{
@@ -280,27 +276,23 @@ public partial class Game : Control
 			// If it is not my turn.
 			if (_turn < 0 && piece.Type > 0 || _turn > 0 && piece.Type < 0)
 			{
-				switch (piece.TileType)
-				{
-					case TileTypes.BLACK: _blackBoardTiles[piece.TileID].SetFilter(TileStates.ILLEGITIMATE); break;
-					case TileTypes.PLAYGROUND: _playgroundBoardTiles[piece.TileID].SetFilter(TileStates.ILLEGITIMATE); break;
-					case TileTypes.WHITE: _whiteBoardTiles[piece.TileID].SetFilter(TileStates.ILLEGITIMATE); break;
-					default: break;
-				}
+				ShowIllegitimateMoves(piece, piece);
 				return;
 			}
 
 			_pieceSelected = piece;
 
 			// TODO: Check if there are any 3 lined pieces to give the player the option to stack on them before showing the possible moves.
+			extraLegitimateTiles = CheckExtraLegitimateTiles();
 
-			ShowPossibleMoves();
+			ShowPossibleMoves(extraLegitimateTiles);
 			return;
 		}
 
 		// If the source and destination pieces are the same.
 		if (_pieceSelected.TileID == piece.TileID && _pieceSelected.TileType == piece.TileType)
 		{
+			ShowIllegitimateMoves(_pieceSelected, piece);
 			_pieceSelected = null;
 			HidePossibleMoves();
 			return;
@@ -309,15 +301,28 @@ public partial class Game : Control
 		// If the destination tile is not in the playground.
 		if (piece.TileType != TileTypes.PLAYGROUND)
 		{
+			ShowIllegitimateMoves(_pieceSelected, piece);
 			_pieceSelected = null;
 			HidePossibleMoves();
 			return;
 		}
 
 		// If the place is not empty and has bigger piece.
-		if (_playgroundBoardPieces[piece.TileID].Count != 0 &&
-				Math.Abs(_pieceSelected.Type) <= Math.Abs(_playgroundBoardPieces[piece.TileID].Peek().Type))
+		if (_playgroundBoardTiles[piece.TileID].Pieces.Count != 0 &&
+				Math.Abs(_pieceSelected.Type) <= Math.Abs(_playgroundBoardTiles[piece.TileID].Pieces.Peek().Type))
 		{
+			ShowIllegitimateMoves(_pieceSelected, piece);
+			_pieceSelected = null;
+			HidePossibleMoves();
+			return;
+		}
+
+		// If the place is not empty and has smaller piece and there are no extra legitimate tiles.
+		if (_playgroundBoardTiles[piece.TileID].Pieces.Count != 0 &&
+				Math.Abs(_pieceSelected.Type) > Math.Abs(_playgroundBoardTiles[piece.TileID].Pieces.Peek().Type) &&
+				!extraLegitimateTiles)
+		{
+			ShowIllegitimateMoves(_pieceSelected, piece);
 			_pieceSelected = null;
 			HidePossibleMoves();
 			return;
@@ -326,24 +331,25 @@ public partial class Game : Control
 		OnTileClicked(_playgroundBoardTiles[piece.TileID]);
 	}
 
-	private void ShowPossibleMoves()
+	private void ShowPossibleMoves(bool extraLegitimateTiles = false)
 	{
 		for (int i = 0; i < _playgroundBoardTiles.Count; i++)
 		{
 			// If I am in the same location in the playground board.
 			if (_pieceSelected.TileType == TileTypes.PLAYGROUND && _pieceSelected.TileID == i) continue;
 
-			// If the place is empty.
-			if (_playgroundBoardPieces[i].Count == 0)
-			{
-				_playgroundBoardTiles[i].SetFilter(TileStates.LEGITIMATE);
-				continue;
-			}
-
-			// If the place has bigger piece.
-			if (Math.Abs(_pieceSelected.Type) <= Math.Abs(_playgroundBoardPieces[i].Peek().Type)) continue;
+			// If the place is not empty.
+			if (_playgroundBoardTiles[i].Pieces.Count != 0) continue;
 
 			_playgroundBoardTiles[i].SetFilter(TileStates.LEGITIMATE);
+		}
+
+		// If there are no extra legitimate tiles.
+		if (!extraLegitimateTiles) return;
+
+		for (int i = 0; i < _extraLegitimateTiles.Count; i++)
+		{
+			_playgroundBoardTiles[_extraLegitimateTiles[i]].SetFilter(TileStates.LEGITIMATE);
 		}
 	}
 
@@ -351,7 +357,30 @@ public partial class Game : Control
 	{
 		for (int i = 0; i < _playgroundBoardTiles.Count; i++)
 		{
+			if (_playgroundBoardTiles[i].State == TileStates.ILLEGITIMATE) continue;
+
 			_playgroundBoardTiles[i].SetFilter(TileStates.NONE);
+		}
+
+		_extraLegitimateTiles.Clear();
+	}
+
+	private void ShowIllegitimateMoves(Piece source, Piece destination)
+	{
+		switch (source.TileType)
+		{
+			case TileTypes.BLACK: _blackBoardTiles[source.TileID].SetFilter(TileStates.ILLEGITIMATE); break;
+			case TileTypes.PLAYGROUND: _playgroundBoardTiles[source.TileID].SetFilter(TileStates.ILLEGITIMATE); break;
+			case TileTypes.WHITE: _whiteBoardTiles[source.TileID].SetFilter(TileStates.ILLEGITIMATE); break;
+			default: break;
+		}
+
+		switch (destination.TileType)
+		{
+			case TileTypes.BLACK: _blackBoardTiles[destination.TileID].SetFilter(TileStates.ILLEGITIMATE); break;
+			case TileTypes.PLAYGROUND: _playgroundBoardTiles[destination.TileID].SetFilter(TileStates.ILLEGITIMATE); break;
+			case TileTypes.WHITE: _whiteBoardTiles[destination.TileID].SetFilter(TileStates.ILLEGITIMATE); break;
+			default: break;
 		}
 	}
 
@@ -359,27 +388,199 @@ public partial class Game : Control
 	{
 		for (int i = 0; i < _blackBoardTiles.Count; i++)
 		{
-			if (_blackBoardTiles[i].State == TileStates.ILLEGITIMATE)
-			{
-				_blackBoardTiles[i].SetFilter(TileStates.NONE);
-			}
+			if (_blackBoardTiles[i].State != TileStates.ILLEGITIMATE) continue;
+			_blackBoardTiles[i].SetFilter(TileStates.NONE);
 		}
 
 		for (int i = 0; i < _playgroundBoardTiles.Count; i++)
 		{
-			if (_playgroundBoardTiles[i].State == TileStates.ILLEGITIMATE)
-			{
-				_playgroundBoardTiles[i].SetFilter(TileStates.NONE);
-			}
+			if (_playgroundBoardTiles[i].State != TileStates.ILLEGITIMATE) continue;
+			_playgroundBoardTiles[i].SetFilter(TileStates.NONE);
 		}
 
 		for (int i = 0; i < _whiteBoardTiles.Count; i++)
 		{
-			if (_whiteBoardTiles[i].State == TileStates.ILLEGITIMATE)
+			if (_whiteBoardTiles[i].State != TileStates.ILLEGITIMATE) continue;
+			_whiteBoardTiles[i].SetFilter(TileStates.NONE);
+		}
+	}
+
+	// TODO: Fix me.
+	private bool CheckExtraLegitimateTiles()
+	{
+		bool extraLegitimateTiles = false;
+		for (int i = 0; i < 4; i++)
+		{
+			int counter = 0;
+
+			// Check for rows.
+			for (int j = 0; j < 4; j++)
 			{
-				_whiteBoardTiles[i].SetFilter(TileStates.NONE);
+				// If the place is empty.
+				if (_playgroundBoardTiles[i * 4 + j].Pieces.Count == 0) continue;
+
+				// If the place has bigger piece.
+				if (Math.Abs(_pieceSelected.Type) <= Math.Abs(_playgroundBoardTiles[i * 4 + j].Pieces.Peek().Type)) continue;
+
+				// If the piece is not mine.
+				if (_turn < 0 && _playgroundBoardTiles[i * 4 + j].Pieces.Peek().Type > 0 ||
+						_turn > 0 && _playgroundBoardTiles[i * 4 + j].Pieces.Peek().Type < 0)
+				{
+					counter++;
+				}
+			}
+
+			// The counter must not be >= 4 beecause in this case the game will be over.
+			if (counter >= 3)
+			{
+				extraLegitimateTiles = true;
+				for (int j = 0; j < 4; j++)
+				{
+					// If the place is empty.
+					if (_playgroundBoardTiles[i * 4 + j].Pieces.Count == 0) continue;
+
+					// If the place has bigger piece.
+					if (Math.Abs(_pieceSelected.Type) <= Math.Abs(_playgroundBoardTiles[i * 4 + j].Pieces.Peek().Type)) continue;
+
+					// If the piece is not mine.
+					if (_turn < 0 && _playgroundBoardTiles[i * 4 + j].Pieces.Peek().Type > 0 ||
+							_turn > 0 && _playgroundBoardTiles[i * 4 + j].Pieces.Peek().Type < 0)
+					{
+						_extraLegitimateTiles.Add(i * 4 + j);
+					}
+				}
+				counter = 0;
+			}
+
+			// Check for columns.
+			for (int j = 0; j < 4; j++)
+			{
+
+				// If the place is empty for columns.
+				if (_playgroundBoardTiles[j * 4 + i].Pieces.Count == 0) continue;
+
+				// If the place has bigger piece for columns.
+				if (Math.Abs(_pieceSelected.Type) <= Math.Abs(_playgroundBoardTiles[j * 4 + i].Pieces.Peek().Type)) continue;
+
+				// If the piece is not mine.
+				if (_turn < 0 && _playgroundBoardTiles[j * 4 + i].Pieces.Peek().Type > 0 ||
+						_turn > 0 && _playgroundBoardTiles[j * 4 + i].Pieces.Peek().Type < 0)
+				{
+					counter++;
+				}
+			}
+
+			// The counter must not be >= 4 beecause in this case the game will be over.
+			if (counter >= 3)
+			{
+				extraLegitimateTiles = true;
+				for (int j = 0; j < 4; j++)
+				{
+
+					// If the place is empty for columns.
+					if (_playgroundBoardTiles[j * 4 + i].Pieces.Count == 0) continue;
+
+					// If the place has bigger piece for columns.
+					if (Math.Abs(_pieceSelected.Type) <= Math.Abs(_playgroundBoardTiles[j * 4 + i].Pieces.Peek().Type)) continue;
+
+					// If the piece is not mine.
+					if (_turn < 0 && _playgroundBoardTiles[j * 4 + i].Pieces.Peek().Type > 0 ||
+							_turn > 0 && _playgroundBoardTiles[j * 4 + i].Pieces.Peek().Type < 0)
+					{
+						_extraLegitimateTiles.Add(j * 4 + i);
+					}
+				}
 			}
 		}
 
+		int temp_counter = 0;
+
+		// Check -45 slope diagonal.
+		for (int j = 0; j < 4; j++)
+		{
+			// If the place is empty for diagonals.
+			if (_playgroundBoardTiles[j * 4 + j].Pieces.Count == 0) continue;
+
+			// If the place has bigger piece for diagonals.
+			if (Math.Abs(_pieceSelected.Type) <= Math.Abs(_playgroundBoardTiles[j * 4 + j].Pieces.Peek().Type)) continue;
+
+			// If the piece is not mine.
+			if (_turn < 0 && _playgroundBoardTiles[j * 4 + j].Pieces.Peek().Type > 0 ||
+					_turn > 0 && _playgroundBoardTiles[j * 4 + j].Pieces.Peek().Type < 0)
+			{
+				temp_counter++;
+			}
+		}
+
+		// The counter must not be >= 4 beecause in this case the game will be over.
+		if (temp_counter >= 3)
+		{
+			extraLegitimateTiles = true;
+			for (int j = 0; j < 4; j++)
+			{
+				// If the place is empty for diagonals.
+				if (_playgroundBoardTiles[j * 4 + j].Pieces.Count == 0) continue;
+
+				// If the place has bigger piece for diagonals.
+				if (Math.Abs(_pieceSelected.Type) <= Math.Abs(_playgroundBoardTiles[j * 4 + j].Pieces.Peek().Type)) continue;
+
+				// If the piece is not mine.
+				if (_turn < 0 && _playgroundBoardTiles[j * 4 + j].Pieces.Peek().Type > 0 ||
+						_turn > 0 && _playgroundBoardTiles[j * 4 + j].Pieces.Peek().Type < 0)
+				{
+					_extraLegitimateTiles.Add(j * 4 + j);
+				}
+			}
+			temp_counter = 0;
+		}
+
+		// Check +45 slope diagonal.
+		for (int j = 0; j < 4; j++)
+		{
+			// If the place is empty for diagonals.
+			if (_playgroundBoardTiles[j * 4 - j + 3].Pieces.Count == 0) continue;
+
+			// If the place has bigger piece for diagonals.
+			if (Math.Abs(_pieceSelected.Type) <= Math.Abs(_playgroundBoardTiles[j * 4 - j + 3].Pieces.Peek().Type)) continue;
+
+			// If the piece is not mine.
+			if (_turn < 0 && _playgroundBoardTiles[j * 4 - j + 3].Pieces.Peek().Type > 0 ||
+					_turn > 0 && _playgroundBoardTiles[j * 4 - j + 3].Pieces.Peek().Type < 0)
+			{
+				temp_counter++;
+			}
+		}
+
+		// The counter must not be >= 4 beecause in this case the game will be over.
+		if (temp_counter >= 3)
+		{
+			extraLegitimateTiles = true;
+			for (int j = 0; j < 4; j++)
+			{
+				// If the place is empty for diagonals.
+				if (_playgroundBoardTiles[j * 4 - j + 3].Pieces.Count == 0) continue;
+
+				// If the place has bigger piece for diagonals.
+				if (Math.Abs(_pieceSelected.Type) <= Math.Abs(_playgroundBoardTiles[j * 4 - j + 3].Pieces.Peek().Type)) continue;
+
+				// If the piece is not mine.
+				if (_turn < 0 && _playgroundBoardTiles[j * 4 - j + 3].Pieces.Peek().Type > 0 ||
+						_turn > 0 && _playgroundBoardTiles[j * 4 - j + 3].Pieces.Peek().Type < 0)
+				{
+					_extraLegitimateTiles.Add(j * 4 - j + 3);
+				}
+			}
+		}
+
+		// GD.Print("Extra Legitimate Tiles:");
+
+		// for (int i = 0; i < _extraLegitimateTiles.Count; i++)
+		// {
+		// 	GD.Print(_extraLegitimateTiles[i]);
+		// }
+
+		// GD.Print("End of Extra Legitimate Tiles.");
+
+		return extraLegitimateTiles;
 	}
 }

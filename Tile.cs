@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using CustomConstants;
+using System.Collections.Generic;
 
 public partial class Tile : Control
 {
@@ -8,6 +9,8 @@ public partial class Tile : Control
 	private TileTypes _type;
 	private ColorRect _filter;
 	private TileStates _state;
+
+	private Stack<Piece> _pieces;
 
 	public Tile()
 	{
@@ -20,6 +23,7 @@ public partial class Tile : Control
 	{
 		_filter = GetNode<ColorRect>("Filter");
 		_state = TileStates.NONE;
+		_pieces = new Stack<Piece>();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -64,6 +68,18 @@ public partial class Tile : Control
 		set
 		{
 			_state = value;
+		}
+	}
+
+	public Stack<Piece> Pieces
+	{
+		get
+		{
+			return _pieces;
+		}
+		set
+		{
+			_pieces = value;
 		}
 	}
 
