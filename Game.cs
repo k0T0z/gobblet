@@ -5,6 +5,11 @@ using CustomConstants;
 
 public partial class Game : Control
 {
+	private bool _gameStarted;
+
+	private bool _blackPlayer; // False = Human, True = AI
+	private bool _whitePlayer; // False = Human, True = AI
+
 	private PackedScene _tileScene;
 	private GridContainer _playgroundBoardTilesNode;
 	private PackedScene _pieceScene;
@@ -29,9 +34,45 @@ public partial class Game : Control
 
 	private List<int> _extraLegitimateTiles;
 
+	public bool GameStarted
+	{
+		get
+		{
+			return _gameStarted;
+		}
+	}
+
+	public int Turn
+	{
+		set
+		{
+			_turn = value;
+		}
+	}
+
+	public bool BlackPlayer
+	{
+		set
+		{
+			_blackPlayer = value;
+		}
+	}
+
+	public bool WhitePlayer
+	{
+		set
+		{
+			_whitePlayer = value;
+		}
+	}
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		_gameStarted = false;
+		_blackPlayer = false; // False = Human, True = AI
+		_whitePlayer = false; // False = Human, True = AI
+
 		_tileScene = GD.Load<PackedScene>("res://scenes/tile.tscn");
 		_playgroundBoardTilesNode = GetNode<GridContainer>("Board/BoardGrid");
 		_pieceScene = GD.Load<PackedScene>("res://scenes/piece.tscn");
@@ -212,6 +253,11 @@ public partial class Game : Control
 
 	public void MovePiece(Piece piece, int location)
 	{
+		if (!_gameStarted)
+		{
+			_gameStarted = true;
+		}
+
 		// piece is the source piece that we need to move.
 		// If we will add a new piece to the ground.
 		if (piece.TileType != TileTypes.PLAYGROUND)
@@ -292,7 +338,6 @@ public partial class Game : Control
 		// If the source and destination pieces are the same.
 		if (_pieceSelected.TileID == piece.TileID && _pieceSelected.TileType == piece.TileType)
 		{
-			ShowIllegitimateMoves(_pieceSelected, piece);
 			_pieceSelected = null;
 			HidePossibleMoves();
 			return;

@@ -20,4 +20,34 @@ public partial class Master : VBoxContainer
 	{
 		_gameNode.InitGame();
 	}
+
+	// False = Black, True = White
+	private void OnFirstMoveToggled(bool toggled_on)
+	{
+		if (_gameNode.GameStarted)
+		{
+			return;
+		}
+
+		if (toggled_on)
+		{
+			_gameNode.Turn = 1;
+		}
+		else
+		{
+			_gameNode.Turn = -1;
+		}
+	}
+
+	// False = Human, True = AI
+	private void OnBlackPlayerToggled(bool toggled_on)
+	{
+		_gameNode.BlackPlayer = toggled_on;
+	}
+
+	// False = Human, True = AI
+	private void OnWhitePlayerToggled(bool toggled_on)
+	{
+		_gameNode.WhitePlayer = toggled_on;
+	}
 }

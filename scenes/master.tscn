@@ -19,13 +19,27 @@ theme_override_constants/margin_bottom = 10
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 
-[node name="Start Game" type="Button" parent="MarginContainer/GameBar"]
+[node name="StartGame" type="Button" parent="MarginContainer/GameBar"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Start Game"
+
+[node name="FirstMove" type="CheckButton" parent="MarginContainer/GameBar"]
+layout_mode = 2
+text = "First Move White"
+flat = true
+
+[node name="BlackPlayer" type="CheckButton" parent="MarginContainer/GameBar"]
+layout_mode = 2
+text = "Black AI"
+
+[node name="WhitePlayer" type="CheckButton" parent="MarginContainer/GameBar"]
+layout_mode = 2
+text = "White AI"
 
 [node name="Game" parent="." instance=ExtResource("2_ekl7p")]
 custom_minimum_size = Vector2(1280, 720)
 layout_mode = 2
 
-[connection signal="pressed" from="MarginContainer/GameBar/Start Game" to="." method="OnStartGamePressed"]
+[connection signal="pressed" from="MarginContainer/GameBar/StartGame" to="." method="OnStartGamePressed"]
+[connection signal="toggled" from="MarginContainer/GameBar/FirstMove" to="." method="OnFirstMoveToggled"]
