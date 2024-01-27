@@ -16,6 +16,21 @@ https://github.com/k0T0z/gobblet/assets/74428638/20445c0f-7bb9-440d-92bf-a178c99
 
 ## Requirements
 
+### Ubuntu Linux 64-bit
+
+- [Godot_v4.2-stable](https://github.com/godotengine/godot/releases/download/4.2-stable/Godot_v4.2-stable_mono_linux_x86_64.zip)
+- Run the following commands:
+```bash
+wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+```
+```bash
+chmod +x ./dotnet-install.sh
+```
+```bash
+./dotnet-install.sh --channel 8.0
+```
+- See [dotnet/core/install/linux?WT.mc_id=dotnet-35129-website](https://learn.microsoft.com/en-gb/dotnet/core/install/linux?WT.mc_id=dotnet-35129-website) for how to download .NET for other Linux distributions.
+
 ### Windows
 
 - [Godot_v4.2-stable](https://github.com/godotengine/godot/releases/download/4.2-stable/Godot_v4.2-stable_mono_win64.zip).
